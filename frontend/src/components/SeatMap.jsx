@@ -5,6 +5,7 @@ function SeatMap({ show, onBack, onConfirm }) {
   // Initialize seats as an empty array
   const [seats, setSeats] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   
   useEffect(() => {
     fetch(`http://127.0.0.1:8000/api/seats/?show_id=${show.id}`)
@@ -88,12 +89,49 @@ function SeatMap({ show, onBack, onConfirm }) {
             Total: ${totalPrice}
           </p>
           <button 
-            onClick={()=>onConfirm(selectedSeats)}  
+            onClick={()=>setShowConfirmDialog(true)}
             className="mt-3 w-full bg-purple-600 text-white py-2 rounded-xl font-semibold hover:bg-purple-700 transition-colors">
             Confirm Booking
           </button>
         </div>
       )}
+
+      {showConfirmDialog && (
+      <div className="fixed inset-0 bg-white bg-opacity-50 flex items-center justify-center z-50">
+        <div className="bg-white rounded-2xl p-6 max-w-sm w-full mx-4 shadow-xl">
+          <h3 className="text-lg font-bold text-gray-800 mb-2">Confirm Booking</h3>
+          <p className="text-gray-500 text-sm mb-4">You are about to book the following seats:</p>
+          
+          <div className="flex flex-wrap gap-2 mb-4">
+            {selectedSeats.map((s) => (
+              <span key={s.id} className="bg-purple-100 text-purple-700 text-sm font-semibold px-3 py-1 rounded-full">
+                {`${s.row}${s.number}`}
+              </span>
+            ))}
+          </div>
+
+          <p className="text-purple-700 font-bold text-lg mb-6">Total: ${totalPrice}</p>
+
+          <div className="flex gap-3">
+            <button
+              onClick={() => setShowConfirmDialog(false)}
+              className="flex-1 py-2 rounded-xl border border-gray-300 text-gray-600 font-semibold hover:bg-gray-50 transition-colors"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={() => {
+                setShowConfirmDialog(false);
+                onConfirm(selectedSeats);
+              }}
+              className="flex-1 py-2 rounded-xl bg-purple-600 text-white font-semibold hover:bg-purple-700 transition-colors"
+            >
+              Yes, Book Now
+            </button>
+          </div>
+        </div>
+      </div>
+    )}
     </div>
   );
 }
