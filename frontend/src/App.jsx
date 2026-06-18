@@ -2,19 +2,23 @@ import { useState, useEffect } from "react";
 import ShowList from "./components/ShowList";
 import SeatMap from "./components/SeatMap";
 import BookingConfirmation from "./components/BookingConfirmation";
+import Login from "./components/Login"
 
 function App() {
+  const [token, setToken] = useState(localStorage.getItem("token"));
   const [currentStep, setCurrentStep] = useState("showList");
   const [selectedShow, setSelectedShow] = useState(null);
   const [bookedSeats, setBookedSeats] = useState([]);
-  const [shows, setShows] = useState([]);
 
-  useEffect(() => {
-    fetch("http://127.0.0.1:8000/api/shows/")
-      .then((res) => res.json())
-      .then((data) => setShows(data))
-      .catch((err) => console.error("Error fetching shows:", err));
-  }, []);
+  function handleLogin(newToken) {
+    localStorage.setItem("token", newToken);
+    setToken(newToken);
+  }
+
+  function handleLogout() {
+    localStorage.removeItem("token");
+    setToken(null);
+  }
 
   function handleShowSelect(show) {
     setSelectedShow(show);
@@ -38,6 +42,7 @@ function App() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          "Authorization": `Token ${token}`,
         },
         body: JSON.stringify(bookingData),
       });
@@ -61,16 +66,24 @@ function App() {
     setCurrentStep("showList");
   }
 
+  if (!token) {
+    return <Login onLogin={handleLogin} />;
+  }
+
   return (
     <div className="min-h-screen bg-gray-50">
-      <header className="bg-purple-700 text-white text-center py-6 shadow-md">
+      <header className="bg-purple-700 text-white text-center py-6 shadow-md relative">
         <h1 className="text-3xl font-bold tracking-wide">🎭 TheatreBook</h1>
         <p className="text-purple-200 text-sm mt-1">Your seats, your show</p>
+        <button
+          onClick={handleLogout}
+          className="absolute top-6 right-6 text-sm text-purple-200 hover:text-white underline"
+        >Logout</button>      
       </header>
 
       {/* Show the right screen based on currentStep */}
       {currentStep === "showList" && (
-        <ShowList shows={shows} onSelect={handleShowSelect} />
+        <ShowList onSelect={handleShowSelect} />
       )}
 
       {currentStep === "seatMap" && (

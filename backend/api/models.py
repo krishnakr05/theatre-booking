@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.auth.models import User
 
 class Show(models.Model):
     title = models.CharField(max_length=200)
@@ -28,6 +29,7 @@ class Seat(models.Model):
 class Booking(models.Model):
     show = models.ForeignKey(Show, on_delete=models.CASCADE, related_name="bookings")
     seats = models.ManyToManyField(Seat)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="bookings")
     booked_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import Seat from "./Seat";
 
-function SeatMap({ show, onBack, onConfirm }) {
+function SeatMap({ show, onBack, onConfirm, token }) {
   // Initialize seats as an empty array
   const [seats, setSeats] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -14,7 +14,7 @@ function SeatMap({ show, onBack, onConfirm }) {
       .catch((err) => console.error("Error fetching seats:", err));
   }, [show.id]);
 
-  // ✅ Derive selectedSeats from seats directly
+  // Derive selectedSeats from seats directly
   const selectedSeats = seats.filter((seat) => seat.status === "selected");
 
   function handleSeatClick(clickedSeat) {
